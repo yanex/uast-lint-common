@@ -1,0 +1,82 @@
+buildscript {
+    repositories {
+        maven { url = uri(rootProject.cloneArtifacts.repository) }
+    }
+    dependencies {
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2"
+    }
+}
+
+// apply the plugin with its class name rather than its Id to work around gradle limitation of
+// not being able to find the plugin by Id despite the dependencies being added right above. Gradle
+// is currently not capable of loading plugins by Id if the dependency is anywhere else than
+// in the main project build.gradle. This file is "imported" into the project's build.gradle
+// through a "apply from:".
+apply plugin: com.jfrog.bintray.gradle.BintrayPlugin
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourcesJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+
+            pom.withXml {
+                asNode().appendNode('description', project.ext.pomDesc)
+                asNode().appendNode('url', 'http://tools.android.com/')
+                asNode().appendNode('name', project.group + '.' + project.archivesBaseName)
+
+                Node license = asNode().appendNode('licenses').appendNode('license')
+                license.appendNode('name', 'The Apache Software License, Version 2.0')
+                license.appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
+                license.appendNode('distribution', 'repo')
+
+                asNode().appendNode('developers')
+                    .appendNode('developer')
+                        .appendNode('name', 'The Android Open Source Project')
+
+                Node scm = asNode().appendNode('scm')
+                scm.appendNode('connection', 'git://android.googlesource.com/platform/tools/base.git')
+                scm.appendNode('url', 'https://android.googlesource.com/platform/tools/base')
+            }
+        }
+    }
+}
+
+bintray {
+    user = System.env.BINTRAY_USER
+    key = System.env.BINTRAY_USER_KEY
+    //dryRun = System.env.BINTRAY_DRYRUN
+
+    publications = [ 'mavenJava' ]
+
+    publish = project.has("release")
+    pkg {
+        userOrg = 'android'
+        repo = 'android-tools'
+        name = project.group + '.' + project.archivesBaseName
+        desc = project.ext.pomDesc
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            desc = project.ext.pomDesc + ' version ' + project.version
+            gpg {
+                sign = true
+                passphrase = System.env.GPG_PASSPHRASE
+            }
+            mavenCentralSync {
+                sync = false
+                user = System.env.SONATYPE_USERNAME
+                password = System.env.SONATYPE_PASSWORD
+                close = '0' // let's close the  and release the version manually.
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+apply from: "../commonHeader.gradle"
+buildscript { apply from: "../commonBuildScript.gradle", to: buildscript }
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.latestCompileSdk
+    buildToolsVersion = rootProject.buildToolsVersion
+
+    sourceSets {
+        main {
+            res {
+                srcDirs 'src/main/res1', 'src/main/res2'
+            }
+        }
+    }
+}

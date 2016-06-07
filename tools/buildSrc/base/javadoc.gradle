@@ -1,0 +1,20 @@
+javadoc {
+    exclude               "**/internal/**"
+    options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
+    options.encoding    = "UTF-8"
+
+    title                 project.ext.pomName
+}
+
+task javadocJar(type: Jar, dependsOn:javadoc) {
+    classifier         'javadoc'
+    from               javadoc.destinationDir
+}
+
+// Only package JavaDoc if using --init-script=buildSrc/base/release.gradle
+if (project.has("release")) {
+    // add javadoc jar tasks as artifacts
+    artifacts {
+        archives javadocJar
+    }
+}

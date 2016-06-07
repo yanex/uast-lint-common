@@ -1,0 +1,14 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.oldSdkForRenderscript
+    buildToolsVersion = rootProject.buildToolsVersion
+
+    defaultConfig {
+        renderscriptTargetApi = 11
+    }
+}
+
+dependencies {
+    compile project(':lib')
+}

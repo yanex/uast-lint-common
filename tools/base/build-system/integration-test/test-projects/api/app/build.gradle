@@ -1,0 +1,20 @@
+// ATTENTION -- hash value of this file is checked in the corresponding
+// integration test. Please make sure any changes you make here are
+// backwards compatible.
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.latestCompileSdk
+    buildToolsVersion = rootProject.buildToolsVersion
+}
+
+project.afterEvaluate {
+    if (android.applicationVariants.size() != 2) {
+        throw new GradleException("Wrong number of app variants!")
+    }
+
+    if (android.testVariants.size() != 1) {
+        throw new GradleException("Wrong number of test variants!")
+    }
+}

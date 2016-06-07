@@ -1,0 +1,19 @@
+apply from: "../commonHeader.gradle"
+buildscript { apply from: "../commonBuildScript.gradle", to: buildscript }
+
+apply plugin: 'com.android.application'
+
+apply from: "../commonLocalRepo.gradle"
+
+android {
+    compileSdkVersion rootProject.latestCompileSdk
+    buildToolsVersion = rootProject.buildToolsVersion
+
+    buildTypes.debug {
+        zipAlignEnabled true
+    }
+}
+
+android.applicationVariants.all { variant ->
+    variant.outputs[0].outputFile = file("$project.buildDir/${variant.name}.apk")
+}

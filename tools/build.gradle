@@ -1,0 +1,150 @@
+apply plugin: 'clone-artifacts'
+
+// Currently, the minimum requirement to run Android SDK tools is Java 1.6
+// So make sure that we are compiling with 1.6
+task('checkJavaVersion') << {
+    def jvmVersion = System.getProperty('java.version')
+    def requiredVersion = System.getenv('JAVA_FOR_TESTS') ?: '1.6'
+    if (!jvmVersion.startsWith(requiredVersion)) {
+        throw new RuntimeException("Tools need to be compiled with Java $requiredVersion, you are using Java $jvmVersion.")
+    }
+}
+final def checkJavaVersionTask = tasks['checkJavaVersion']
+
+allprojects { subproject ->
+    tasks.withType(JavaForkOptions) {
+        // Prevent forked processes from stealing focus (on MacOS at least)
+        jvmArgs '-Djava.awt.headless=true'
+    }
+
+    afterEvaluate {
+        // Only check if we are doing build type tasks. Things like dependency listing
+        // should still work with a "wrong" java version.
+        final def buildTasks = ['build', 'compileJava', 'compileGroovy', 'classes', 'assemble', 'javadoc', 'groovydoc', 'check']
+        // Task.doFirst does not run if the task has no work to do. Need to be more aggressive than that.
+        // Some projects won't have all of these tasks, so need to use findByName.
+        buildTasks.each { subproject.tasks.findByName(it)?.dependsOn(checkJavaVersionTask) }
+        subproject.tasks.findByName('compileJava')?.options?.setIncremental(true)
+    }
+}
+
+// artifact cloning destinations
+cloneArtifacts {
+    repository = "$rootDir/../prebuilts/tools/common/m2/repository"
+}
+
+if (System.env.USE_EXTERNAL_REPO != null) {
+  allprojects {
+    repositories {
+        maven { url = uri(rootProject.cloneArtifacts.repository) }
+        jcenter()
+        maven { url 'https://repo.gradle.org/gradle/libs-snapshots-local' }
+        maven { url 'https://repo.gradle.org/gradle/libs-releases-local' }
+    }
+  }
+}
+
+/*
+ * With the build server you are given two env variables.
+ * The OUT_DIR is a temporary directory you can use to put things during the build.
+ * The DIST_DIR is where you want to save things from the build.
+ *
+ * The build server will copy the contents of DIST_DIR to somewhere and make it available.
+ */
+if (System.env.DIST_DIR != null && System.env.OUT_DIR != null) {
+    ext.androidHostOut = file(System.env.OUT_DIR)
+    ext.androidHostDist = file(System.env.DIST_DIR)
+} else {
+    // ext.androidHostOut is shared by all tools/{base,build,swt} gradle projects/
+    ext.androidHostOut = file("$rootDir/../out")
+    ext.androidHostDist = new File(ext.androidHostOut, "dist")
+}
+
+
+// rootProject.buildDir is specific to this gradle build.
+buildDir = new File(ext.androidHostOut, "build/root")
+
+
+// apply this after the buildDir has been changed.
+apply plugin: 'sdk-tools'
+
+
+ext.localRepo = project.hasProperty('localRepo') ? localRepo : "$ext.androidHostOut/repo"
+
+apply from: "$rootDir/buildSrc/base/version.gradle"
+
+subprojects { Project project ->
+    // Change buildDir first so that all plugins pick up the new value.
+    project.buildDir = project.file("$project.parent.buildDir/../$project.name/build")
+}
+
+// delay evaluation of this project before all subprojects have been evaluated.
+subprojects.each { subproject -> evaluationDependsOn(subproject.path) }
+
+def testTasks = subprojects.collect { it.tasks.withType(Test) }.flatten()
+
+// Print failed tests to the console early.
+testTasks.each { task ->
+    task.testLogging {
+        events "failed", "skipped"
+    }
+}
+
+task aggregateResults(type: Copy) {
+    from { testTasks*.binResultsDir*.parentFile*.parentFile }
+    into { file("$buildDir/results") }
+}
+
+task prepareRepo(type: Copy) {
+    from { rootProject.cloneArtifacts.repository }
+    into { "$rootProject.ext.androidHostOut/repo" }
+}
+
+task copyGradleProperty(type: Copy) {
+    from { "${System.env.HOME}/.gradle/gradle.properties" }
+    into { gradle.gradleUserHomeDir }
+}
+
+tasks.create(name: 'publishLocal')
+subprojects { project ->
+    if (project.tasks.findByName('publishLocal') != null) {
+        rootProject.publishLocal.dependsOn project.publishLocal
+    }
+}
+
+task setupGradleInIde << {
+    File dir = gradle.gradleHomeDir
+    File gradleDistLink = new File(project.ext.androidHostOut, "gradle-dist-link")
+    if (gradleDistLink.exists()) {
+        gradleDistLink.delete()
+    }
+    String link = dir.path.substring(project.ext.androidHostOut.path.length() + 1)
+    String command = "ln -s $link ${gradleDistLink.path}"
+    command.execute()
+}
+
+// basic task for custom distribution of project should the build server.
+task dist << {
+}
+
+apply plugin: 'offline-repo'
+
+task clean << {
+  delete 'build'
+
+  /*new File("$localRepo/com/android/tools").eachFile {
+    if (it.name != "external") {
+      delete it
+    }
+  }*/
+}
+apply plugin: 'presubmit-runner'
+// Task for initializing a fresh repo.
+task init {
+  dependsOn prepareRepo
+  dependsOn setupGradleInIde
+  dependsOn copyGradleProperty
+  dependsOn tasks.findByPath(':base:gradle-experimental:setupGradleInIde')
+  dependsOn tasks.findByPath(':base:builder:generateVersionConstantsJava')
+  dependsOn tasks.findByPath(':base:gradle-core:generateGrammarSource')
+}

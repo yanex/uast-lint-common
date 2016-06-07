@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="uast-java">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../prebuilts/tools/common/m2/repository/org/jetbrains/uast/uast-java/1.0/uast-java-1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../kotlin.new/plugins/uast-java/src" />
+      <root url="file://$PROJECT_DIR$/../../../kotlin.new/plugins/uast-common/src" />
+    </SOURCES>
+  </library>
+</component>

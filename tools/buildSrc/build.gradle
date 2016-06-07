@@ -1,0 +1,36 @@
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+repositories {
+    maven { url = "$rootDir/../../prebuilts/tools/common/m2/repository" }
+    maven { url = "$rootDir/../../prebuilts/tools/common/m2/internal" }
+}
+
+buildDir = "../../out/build/buildSrc/build"
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+
+    compile "commons-io:commons-io:1.3.2"
+    compile "com.google.guava:guava:15.0"
+    compile 'commons-lang:commons-lang:2.6@jar'
+    compile "org.pegdown:pegdown:1.1.0"
+    compile "org.jsoup:jsoup:1.6.3"
+
+    testCompile "junit:junit:3.8.1"
+}
+
+// See README.
+sourceSets {
+    main {
+        groovy {
+            srcDir 'src/fromGradle/groovy'
+        }
+
+        resources {
+            srcDir 'src/fromGradle/resources'
+        }
+    }
+}

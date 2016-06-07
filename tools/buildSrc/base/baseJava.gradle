@@ -1,0 +1,47 @@
+apply plugin: 'java'
+apply plugin: 'clone-artifacts'
+apply plugin: 'maven'
+
+repositories {
+    maven { url = uri(rootProject.cloneArtifacts.repository) }
+    maven { url = "$rootDir/../tools/data-binding/maven-repo"}
+    maven { url = "$rootDir/../tools/data-binding/internal-prebuilts"}
+}
+
+test {
+    // todo: disable this for CI since we'll use the CI UI to do the report.
+    reports.html.enabled = true
+}
+
+apply from: "$rootDir/buildSrc/base/base.gradle"
+
+task publishLocal(type: Upload) {
+    configuration = configurations.archives
+    repositories {
+        mavenDeployer {
+            repository(url: uri("$rootProject.ext.localRepo"))
+            pom.project {
+                url 'http://tools.android.com'
+                inceptionYear '2007'
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                scm {
+                    url 'https://android.googlesource.com/platform/tools/base'
+                    connection 'git://android.googlesource.com/platform/tools/base.git'
+                }
+                developers {
+                    developer {
+                        name 'The Android Open Source Project'
+                    }
+                }
+            }
+        }
+    }
+}

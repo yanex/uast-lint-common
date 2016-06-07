@@ -1,0 +1,17 @@
+project.ext.baseVersion = '25.0.0-rc1'
+project.ext.buildVersion = '2.0.0-rc1'
+project.ext.experimentalVersion = '0.6.0-rc1'
+
+// This counter should be incremented every time the api is changed in not backward-compatible way,
+// i.e. it should be incremented from N to N+1 only when the api is changed in a way that existing
+// plugin v.N clients will be unable to work with v.N+1
+
+// Plugin Versions		apiVersion	nativeApiVersion
+// 1.0.x			0
+// 1.1.x			0
+// 1.2.x			2
+// 1.3.x			3
+// 1.4.x			3		0
+
+project.ext.apiVersion = 3
+project.ext.nativeApiVersion = 0

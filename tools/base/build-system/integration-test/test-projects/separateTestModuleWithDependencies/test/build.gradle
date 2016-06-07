@@ -1,0 +1,9 @@
+apply plugin: 'com.android.test'
+
+android {
+    compileSdkVersion rootProject.latestCompileSdk
+    buildToolsVersion = rootProject.buildToolsVersion
+
+    targetProjectPath ':app'
+    targetVariant 'minified'
+}

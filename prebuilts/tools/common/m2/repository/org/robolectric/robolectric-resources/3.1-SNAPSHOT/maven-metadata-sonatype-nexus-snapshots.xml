@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>org.robolectric</groupId>
+  <artifactId>robolectric-resources</artifactId>
+  <version>3.1-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20151125.203309</timestamp>
+      <buildNumber>105</buildNumber>
+    </snapshot>
+    <lastUpdated>20151125203309</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>3.1-20151125.203309-105</value>
+        <updated>20151125203309</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>3.1-20151125.203309-105</value>
+        <updated>20151125203309</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>sources</classifier>
+        <extension>jar</extension>
+        <value>3.1-20151125.203309-105</value>
+        <updated>20151125203309</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>javadoc</classifier>
+        <extension>jar</extension>
+        <value>3.1-20151125.203309-105</value>
+        <updated>20151125203309</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>

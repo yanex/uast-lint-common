@@ -1,0 +1,12 @@
+apply plugin: 'com.android.application'
+
+android {
+  compileSdkVersion rootProject.latestCompileSdk
+  buildToolsVersion = rootProject.buildToolsVersion
+
+}
+
+dependencies {
+  wearApp project(':wear')
+}
+

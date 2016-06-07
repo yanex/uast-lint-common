@@ -1,0 +1,32 @@
+/*apply plugin: 'findbugs'
+
+// since 2.1 findbugs is 3.0.0 by default which does not work on Java 6
+findbugs {
+    toolVersion = '2.0.3'
+    ignoreFailures = true
+    effort = "max"
+    reportLevel = "high"
+}
+
+
+// find bug dependencies is added dynamically so it's hard for the
+// clone artifact plugin to find it. This custom config lets us manually
+// add such dependencies.
+configurations {
+    hidden
+}
+dependencies {
+    hidden "com.google.code.findbugs:findbugs:2.0.3"
+}
+*/
+
+// set all java compilation to use UTF-8 encoding.
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+task disableTestFailures << {
+    tasks.withType(Test) {
+        ignoreFailures = true
+    }
+}
