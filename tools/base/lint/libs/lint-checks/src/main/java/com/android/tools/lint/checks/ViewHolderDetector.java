@@ -18,11 +18,9 @@ package com.android.tools.lint.checks;
 
 import static com.android.SdkConstants.CLASS_VIEW;
 import static com.android.SdkConstants.CLASS_VIEWGROUP;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_INT;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.android.tools.lint.client.api.UastLacks;
 import com.android.tools.lint.client.api.UastLintUtils;
 import com.android.tools.lint.detector.api.Category;
 import com.android.tools.lint.detector.api.Detector;
@@ -39,7 +37,9 @@ import org.jetbrains.uast.UFunction;
 import org.jetbrains.uast.UIfExpression;
 import org.jetbrains.uast.UQualifiedExpression;
 import org.jetbrains.uast.USwitchExpression;
+import org.jetbrains.uast.util.UTypeConstraint;
 import org.jetbrains.uast.util.UastExpressionUtils;
+import org.jetbrains.uast.util.UastSignatureChecker;
 import org.jetbrains.uast.visitor.AbstractUastVisitor;
 import org.jetbrains.uast.visitor.UastVisitor;
 
@@ -115,8 +115,10 @@ public class ViewHolderDetector extends Detector implements Detector.UastScanner
          * method: getView(int position, View convertView, ViewGroup parent)
          */
         private static boolean isViewAdapterMethod(UFunction node) {
-            return GET_VIEW.equals(node.getName()) && UastLacks.parametersMatches(node,
-                    TYPE_INT, CLASS_VIEW, CLASS_VIEWGROUP);
+            return GET_VIEW.equals(node.getName()) && UastSignatureChecker.matchesSignature(node,
+                    UTypeConstraint.PRIMITIVE_INT, 
+                    UTypeConstraint.make(CLASS_VIEW), 
+                    UTypeConstraint.make(CLASS_VIEWGROUP));
         }
     }
 
