@@ -62,7 +62,7 @@ import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
 import org.eclipse.jdt.internal.compiler.lookup.PackageBinding;
 import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
-import org.jetbrains.uast.EmptyUExpression;
+import org.jetbrains.uast.UastEmptyExpression;
 import org.jetbrains.uast.UAnnotated;
 import org.jetbrains.uast.UAnnotation;
 import org.jetbrains.uast.UArrayValue;
@@ -1571,7 +1571,7 @@ public class ExternalAnnotationRepository {
                         }
 
                         expressions.add(new UNamedExpression(
-                                valueName, new EmptyUExpression(annotation), /* parent = */ null));
+                                valueName, UastEmptyExpression.INSTANCE, /* parent = */ null));
                     }
                 }
             }

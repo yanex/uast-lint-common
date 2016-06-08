@@ -71,6 +71,7 @@ import junit.framework.TestCase;
 
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.uast.java.JavaConverter;
+import org.jetbrains.uast.UFile;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -493,7 +494,7 @@ public class LintUtilsTest extends TestCase {
             PsiFile javaFile = javaClass.getContainingFile();
             assert javaFile instanceof PsiJavaFile : "Couldn't parse source as Java class";
             PsiJavaFile psiJavaFile = (PsiJavaFile) javaFile;
-            context.setUFile(JavaConverter.INSTANCE.convert(psiJavaFile));
+            context.setUFile((UFile) JavaConverter.INSTANCE.convertWithParent(psiJavaFile, UFile.class));
         }
         return context;
     }

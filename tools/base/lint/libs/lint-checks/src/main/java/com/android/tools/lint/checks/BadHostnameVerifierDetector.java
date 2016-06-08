@@ -33,7 +33,7 @@ import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.uast.EmptyUExpression;
+import org.jetbrains.uast.UastEmptyExpression;
 import org.jetbrains.uast.UCallExpression;
 import org.jetbrains.uast.UClass;
 import org.jetbrains.uast.UExpression;
@@ -122,7 +122,7 @@ public class BadHostnameVerifierDetector extends Detector implements Detector.Ua
         @Override
         public boolean visitReturnExpression(@NotNull UReturnExpression node) {
             UExpression argument = node.getReturnExpression();
-            if (argument != null && !(argument instanceof EmptyUExpression)) {
+            if (argument != null && !(argument instanceof UastEmptyExpression)) {
                 // TODO: Only do this if certain that there isn't some intermediate
                 // assignment, as exposed by the unit test
                 //Object value = ConstantEvaluator.evaluate(mContext, argument);

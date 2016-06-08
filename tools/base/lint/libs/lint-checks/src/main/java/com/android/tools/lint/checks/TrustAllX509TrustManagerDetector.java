@@ -30,7 +30,7 @@ import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.uast.EmptyUExpression;
+import org.jetbrains.uast.UastEmptyExpression;
 import org.jetbrains.uast.UBlockExpression;
 import org.jetbrains.uast.UClass;
 import org.jetbrains.uast.UElement;
@@ -182,7 +182,7 @@ public class TrustAllX509TrustManagerDetector extends Detector implements Detect
             if (node instanceof UExpression &&
                     !(node instanceof UReturnExpression
                             || node instanceof UBlockExpression
-                            || node instanceof EmptyUExpression)) {
+                            || node instanceof UastEmptyExpression)) {
                 isComplex = true;
             }
 
